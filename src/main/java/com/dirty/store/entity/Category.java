@@ -4,9 +4,7 @@ import com.dirty.store.entity.base.NamedIndexEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -14,18 +12,31 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(callSuper = true)
 @Table(name = "category")
+/*
+@NamedEntityGraph(name = "category.subCategories",
+        attributeNodes = {@NamedAttributeNode(value = "subCategories")}
+)
+ */
 public class Category extends NamedIndexEntity {
 
-    @Column(name = "description", columnDefinition = "TEXT CHECK (length(description) >= 10)")
+    @Column(name = "description", columnDefinition = "TEXT CHECK (length(description) >= 2)")
     private String description;
 
+
+    @Column(name = "parent_id", columnDefinition = "integer constraint category_parent_idx references category")
+    private Integer parentId;
+
+
+/*
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     private Category parentCategory;
 
-    @ToString.Exclude
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentCategory")
+  //  @BatchSize(size = 15)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "parentCategory")
     private Set<Category> subCategories = new HashSet<>();
+
+ */
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
@@ -34,5 +45,6 @@ public class Category extends NamedIndexEntity {
     @ToString.Exclude
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Specific> specifics;
+
 
 }

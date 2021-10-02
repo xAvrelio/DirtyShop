@@ -21,4 +21,9 @@ public class ItemWarehouse extends IndexEntity {
     @Column(name = "stock", nullable = false, columnDefinition = "INT")
     private Integer stock;
 
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
+
 }

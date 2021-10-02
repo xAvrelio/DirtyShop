@@ -4,7 +4,6 @@ import com.dirty.store.entity.base.IndexEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.net.URL;
 
 @Entity
 @Getter
@@ -18,13 +17,10 @@ public class Photo extends IndexEntity {
     private Integer ordId;
 
     @Column(name = "main_url")
-    private URL mainUrl;
+    private String mainUrl;
 
     @Column(name = "thumb_url")
-    private URL thumbUrl;
-
-    @Column(name = "original_url")
-    private URL originalUrl;
+    private String thumbUrl;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

@@ -8,7 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -17,6 +17,17 @@ import java.util.List;
 @ToString
 @Table(name = "items")
 @Where(clause = "is_active = true")
+@NamedEntityGraph(
+        name = "item_full_desc",
+        attributeNodes = {@NamedAttributeNode("fullDescription"), @NamedAttributeNode("photos"),
+                @NamedAttributeNode("brand"), @NamedAttributeNode(value = "itemCondition", subgraph = "itemCondition.name"),
+                @NamedAttributeNode("itemReturnPolicy"), @NamedAttributeNode(value = "itemWarehouse", subgraph = "itemWarehouse.name"),
+                @NamedAttributeNode("category"), @NamedAttributeNode("itemSpecs")},
+        subgraphs = {@NamedSubgraph(name = "itemCondition.name",
+                attributeNodes = @NamedAttributeNode(value = "condition")),
+                @NamedSubgraph(name = "itemWarehouse.name",
+                        attributeNodes = @NamedAttributeNode(value = "warehouse"))}
+)
 public class Item extends NamedIndexEntity {
 
     /*
@@ -28,17 +39,23 @@ public class Item extends NamedIndexEntity {
     @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean isActive;
 
-    @Column(name = "short_description", nullable = false, columnDefinition = "TEXT CHECK (length(short_description) >= 10)")
+    @Column(name = "short_description", nullable = false, columnDefinition = "TEXT CHECK (length(short_description) >= 2)")
     private String shortDescription;
 
-    @Column(name = "full_description", nullable = false, columnDefinition = "TEXT CHECK (length(full_description) >= 10)")
+    @ToString.Exclude
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "full_description", nullable = false, columnDefinition = "TEXT CHECK (length(full_description) >= 2)")
     private String fullDescription;
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderBy(value = "ordId")
-    private List<Photo> photos;
+    private Set<Photo> photos;
+
+    @ToString.Exclude
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<ItemWarehouse> itemWarehouse;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,19 +63,12 @@ public class Item extends NamedIndexEntity {
     private Brand brand;
 
     @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "condition_id")
-    private ItemCondition condition;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "item")
+    private ItemCondition itemCondition;
 
     @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "return_policy_id")
-    private ItemReturnPolicy returnPolicy;
-
-    @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id")
-    private ItemWarehouse itemWarehouse;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "item")
+    private ItemReturnPolicy itemReturnPolicy;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,5 +78,5 @@ public class Item extends NamedIndexEntity {
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<ItemSpec> itemSpecs;
+    private Set<ItemSpec> itemSpecs;
 }

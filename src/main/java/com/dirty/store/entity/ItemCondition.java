@@ -13,13 +13,17 @@ import javax.persistence.*;
 @Table(name = "item_conditions")
 public class ItemCondition extends IndexEntity {
 
-    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "condition_id")
+    @ToString.Exclude
     private Condition condition;
 
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT CHECK (length(description) >= 10)")
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT CHECK (length(description) >= 2)")
     private String description;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    @ToString.Exclude
+    private Item item;
 
 }

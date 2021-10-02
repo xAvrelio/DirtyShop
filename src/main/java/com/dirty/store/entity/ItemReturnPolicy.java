@@ -18,6 +18,11 @@ public class ItemReturnPolicy extends IndexEntity {
     @JoinColumn(name = "return_policy_id")
     private ReturnPolicy returnPolicy;
 
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT CHECK (length(description) >= 10)")
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT CHECK (length(description) >= 2)")
     private String description;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    @ToString.Exclude
+    private Item item;
 }
